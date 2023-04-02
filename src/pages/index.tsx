@@ -9,6 +9,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 dayjs.extend(relativeTime);
 
@@ -22,6 +23,15 @@ const CreatePost = () => {
     onSuccess: () => {
       setInputValue("");
       void ctx.posts.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Failed to post, please try again later.");
+      }
     },
   });
 
@@ -42,14 +52,30 @@ const CreatePost = () => {
         className="grow bg-transparent outline-none"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
-      />
-      <button
         disabled={isPosting}
-        type="button"
-        onClick={() => mutate({ content: inputValue })}
-      >
-        Send
-      </button>
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (inputValue !== "") {
+              mutate({ content: inputValue });
+            }
+          }
+        }}
+      />
+      {inputValue !== "" && !isPosting && (
+        <button
+          disabled={isPosting}
+          type="button"
+          onClick={() => mutate({ content: inputValue })}
+        >
+          Send
+        </button>
+      )}
+      {isPosting && (
+        <div className="flex items-center justify-center">
+          <LoadingSpinner size={20} />
+        </div>
+      )}
     </div>
   );
 };
