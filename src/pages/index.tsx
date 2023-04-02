@@ -8,11 +8,22 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useState } from "react";
 
 dayjs.extend(relativeTime);
 
 const CreatePost = () => {
   const { user } = useUser();
+  const [inputValue, setInputValue] = useState("");
+
+  const ctx = api.useContext();
+
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setInputValue("");
+      void ctx.posts.getAll.invalidate();
+    },
+  });
 
   if (!user) return null;
 
@@ -29,7 +40,16 @@ const CreatePost = () => {
         type="text"
         placeholder="Type something!"
         className="grow bg-transparent outline-none"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
       />
+      <button
+        disabled={isPosting}
+        type="button"
+        onClick={() => mutate({ content: inputValue })}
+      >
+        Send
+      </button>
     </div>
   );
 };
@@ -77,7 +97,7 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
-      {data?.map(({ post, author }) => (
+      {data.map(({ post, author }) => (
         <PostView post={post} author={author} key={post.id} />
       ))}
     </div>
