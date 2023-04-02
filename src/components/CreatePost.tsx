@@ -1,9 +1,9 @@
+import Image from "next/image";
+import toast from "react-hot-toast";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { LoadingSpinner } from "./LoadingSpinner";
-import Image from "next/image";
 
 export const CreatePost: React.FC = () => {
   const { user } = useUser();

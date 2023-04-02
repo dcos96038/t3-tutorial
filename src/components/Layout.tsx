@@ -1,6 +1,6 @@
-import { api } from "@/utils/api";
-import { useUser, SignInButton } from "@clerk/nextjs";
 import React from "react";
+import { api } from "@/utils/api";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import { CreatePost } from "./CreatePost";
 
 interface Props {
